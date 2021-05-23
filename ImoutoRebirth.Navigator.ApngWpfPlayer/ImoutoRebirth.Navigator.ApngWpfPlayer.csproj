@@ -11,7 +11,7 @@
     <Product>ApngWpfPlayer</Product>
     <Description>Wpf user control that can show apng/png animated files and play them</Description>
     <Copyright>ImoutoChan</Copyright>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <PackageId>ImoutoRebirth.ApngWpfPlayer</PackageId>
     <PackageProjectUrl>https://github.com/ImoutoChan/ApngWpfPlayer</PackageProjectUrl>
   </PropertyGroup>

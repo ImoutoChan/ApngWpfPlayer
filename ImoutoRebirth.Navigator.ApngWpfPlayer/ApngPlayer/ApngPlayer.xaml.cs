@@ -137,7 +137,9 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                             ? WriteableBitmapExtensions.BlendMode.None
                             : WriteableBitmapExtensions.BlendMode.Alpha;
 
-                        if (blendMode == WriteableBitmapExtensions.BlendMode.None)
+                        if (blendMode == WriteableBitmapExtensions.BlendMode.None
+                            && frameBitmap.Width == writeableBitmap.Width
+                            && frameBitmap.Height == writeableBitmap.Height)
                         {
                             writeableBitmap = frameBitmap;
                         }
