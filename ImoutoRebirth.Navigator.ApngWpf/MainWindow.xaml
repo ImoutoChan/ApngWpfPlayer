@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280">
     <Grid>
-        <apngPlayer:ApngPlayer Source="C:\Users\Oniii-chan\Desktop\884e7762026ea60d4f9c59fd68f74c6b.png" />
+        <apngPlayer:ApngPlayer Source="69060e4e568c52eef85883be8e7050f7.png" />
     </Grid>
 </Window>

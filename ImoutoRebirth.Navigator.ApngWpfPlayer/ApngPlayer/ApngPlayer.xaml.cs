@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ImoutoRebirth.Navigator.ApngWpfPlayer.ApngEngine;
+using ImoutoRebirth.Navigator.ApngWpfPlayer.ApngEngine.Chunks;
 
 namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
 {
@@ -132,17 +133,24 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                     {
                         var frameBitmap = BitmapFactory.FromStream(frame.GetStream());
 
-                        var blendMode = _currentFrame == 0
+                        var blendMode = _currentFrame == 0 || frame.FcTlChunk.BlendOp == BlendOps.ApngBlendOpSource
                             ? WriteableBitmapExtensions.BlendMode.None
                             : WriteableBitmapExtensions.BlendMode.Alpha;
 
-                        writeableBitmap.Blend(
-                            new Point((int) (xOffset),
-                                (int) (yOffset)),
-                            frameBitmap,
-                            new Rect(0, 0, frame.FcTlChunk.Width, frame.FcTlChunk.Height),
-                            Colors.White,
-                            blendMode);
+                        if (blendMode == WriteableBitmapExtensions.BlendMode.None)
+                        {
+                            writeableBitmap = frameBitmap;
+                        }
+                        else
+                        {
+                            writeableBitmap.Blend(
+                                new Point((int) (xOffset),
+                                    (int) (yOffset)),
+                                frameBitmap,
+                                new Rect(0, 0, frame.FcTlChunk.Width, frame.FcTlChunk.Height),
+                                Colors.White,
+                                blendMode);
+                        }
                     }
                     _readyFrames.Add(writeableBitmap.Clone());
                     _readyFrames[_currentFrame].Freeze();

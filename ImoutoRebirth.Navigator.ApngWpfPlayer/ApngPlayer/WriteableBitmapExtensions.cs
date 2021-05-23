@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -80,9 +82,8 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                 return;
             }
 
-            var sourcePixels = srcContext.Pixels;
             var destPixels = destContext.Pixels;
-            var sourceLength = srcContext.Length;
+            var sourceLength = dw * dh;
 
             var px = (int) destRect.X;
             var py = (int) destRect.Y;
@@ -110,12 +111,12 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                     double ii = sourceStartX;
                     var idx = px + y * dpw;
                     var x = px;
-                    var sourcePixel = sourcePixels[0];
+                    var sourcePixel = GetPixelValue(srcContext, 0);
 
                     // Scan line BlockCopy is much faster (3.5x) if no tinting and blending is needed,
                     // even for smaller sprites like the 32x32 particles. 
                     int sourceIdx;
-                    if (blendMode == BlendMode.None && !tinted)
+                    if (blendMode == BlendMode.None && !tinted && srcContext.Format.BitsPerPixel == 4*8)
                     {
                         sourceIdx = (int) ii + (int) jj * sourceWidth;
                         var offset = x < 0 ? -x : 0;
@@ -124,6 +125,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                         var len = xx + wx < dpw ? wx : dpw - xx;
                         if (len > sw) len = sw;
                         if (len > dw) len = dw;
+
                         BitmapContext.BlockCopy(
                             srcContext,
                             (sourceIdx + offset) * 4,
@@ -144,7 +146,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                                     sourceIdx = (int) ii + (int) jj * sourceWidth;
                                     if (sourceIdx >= 0 && sourceIdx < sourceLength)
                                     {
-                                        sourcePixel = sourcePixels[sourceIdx];
+                                        sourcePixel = GetPixelValue(srcContext, sourceIdx);
                                         var sa = (sourcePixel >> 24) & 0xff;
                                         var sr = (sourcePixel >> 16) & 0xff;
                                         var sg = (sourcePixel >> 8) & 0xff;
@@ -182,6 +184,21 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                 jj += sdy;
                 y++;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int GetPixelValue(BitmapContext sourcePixels, int index)
+        {
+            if (sourcePixels.Format.BitsPerPixel != 8) 
+                return sourcePixels.Pixels[index];
+
+
+            var pixels = (byte*) sourcePixels.WriteableBitmap.BackBuffer;
+            var trueColor = sourcePixels.WriteableBitmap.Palette.Colors[pixels[index]];
+
+            var intColor = BitConverter.ToInt32(new[] {trueColor.B, trueColor.G, trueColor.R, trueColor.A}, 0);
+                
+            return intColor;
         }
     }
 }

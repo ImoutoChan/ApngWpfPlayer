@@ -5,6 +5,12 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>ImoutoChan</Authors>
+    <Company>ImoutoRebirth</Company>
+    <Product>ApngWpfPlayer</Product>
+    <Description>Wpf user control that can show apng/png animated files and play them</Description>
+    <Copyright>ImoutoChan</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

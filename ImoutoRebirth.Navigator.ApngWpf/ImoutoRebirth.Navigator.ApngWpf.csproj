@@ -11,4 +11,10 @@
     <ProjectReference Include="..\ImoutoRebirth.Navigator.ApngWpfPlayer\ImoutoRebirth.Navigator.ApngWpfPlayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="69060e4e568c52eef85883be8e7050f7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
