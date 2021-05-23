@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31025.218
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImoutoRebirth.Navigator.ApngWpf", "ImoutoRebirth.Navigator.ApngWpf\ImoutoRebirth.Navigator.ApngWpf.csproj", "{3C0981BA-7DF5-4B57-9D90-D5526B78DC71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImoutoRebirth.Navigator.ApngWpfPlayer", "ImoutoRebirth.Navigator.ApngWpfPlayer\ImoutoRebirth.Navigator.ApngWpfPlayer.csproj", "{F9A5C2D9-2868-419C-8A36-961BD4DE71C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C0981BA-7DF5-4B57-9D90-D5526B78DC71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C0981BA-7DF5-4B57-9D90-D5526B78DC71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C0981BA-7DF5-4B57-9D90-D5526B78DC71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C0981BA-7DF5-4B57-9D90-D5526B78DC71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9A5C2D9-2868-419C-8A36-961BD4DE71C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9A5C2D9-2868-419C-8A36-961BD4DE71C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9A5C2D9-2868-419C-8A36-961BD4DE71C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9A5C2D9-2868-419C-8A36-961BD4DE71C7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {932F5995-9194-416A-B8BF-90450CE15E3D}
+	EndGlobalSection
+EndGlobal
