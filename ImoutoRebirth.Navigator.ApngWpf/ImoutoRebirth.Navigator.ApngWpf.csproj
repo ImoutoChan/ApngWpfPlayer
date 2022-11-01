@@ -15,6 +15,9 @@
     <None Update="69060e4e568c52eef85883be8e7050f7.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="e310012a65b7327a2aae463b2e8b01bf.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

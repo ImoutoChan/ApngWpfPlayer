@@ -17,12 +17,8 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
     public partial class ApngPlayer : UserControl
     {
         private readonly SemaphoreSlim _loadLocker = new(1);
-        private readonly List<WriteableBitmap> _readyFrames = new();
-
-        private bool _isPlaying = false;
-        private int _currentFrame = -1;
-        private bool _loaded = false;
         private ApngImage? _apngSource;
+        private CancellationTokenSource? _playingToken;
 
         public ApngPlayer()
         {
@@ -53,23 +49,16 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
             }
             else
             {
-                await control.LoadApng(path);
+                await control.ReloadApng(path);
             }
         }
 
-
-        private async Task LoadApng(string path)
+        private async Task ReloadApng(string path)
         {
-            if (_loaded)
-                return;
-
             await _loadLocker.WaitAsync();
 
             try
             {
-                if (_loaded)
-                    return;
-                
                 StopPlaying();
 
                 _apngSource = new ApngImage(path);
@@ -80,47 +69,48 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                 }
                 else
                 {
-                    StartPlaying();
+                    _playingToken = new CancellationTokenSource();
+                    StartPlaying(_playingToken.Token);
                 }
-
-                _loaded = true;
             }
             finally
             {
                 _loadLocker.Release();
             }
         }
+
         private void UnloadApng()
         {
             StopPlaying();
             _apngSource = null;
         }
 
-        private async void StartPlaying()
+        private async void StartPlaying(CancellationToken ct)
         {
-            if (_isPlaying)
+            if (ct.IsCancellationRequested)
                 return;
-
-            _isPlaying = true;
 
             if (_apngSource == null)
             {
                 throw new InvalidOperationException();
             }
             
+            var currentFrame = -1;
+            List<WriteableBitmap> readyFrames = new();
             WriteableBitmap? writeableBitmap = null;
-            while (_isPlaying)
-            {
-                _currentFrame++;
 
-                if (_currentFrame >= _apngSource.Frames.Length)
-                    _currentFrame = 0;
+            while (!ct.IsCancellationRequested)
+            {
+                currentFrame++;
+
+                if (currentFrame >= _apngSource.Frames.Length)
+                    currentFrame = 0;
 
                 if (_apngSource.Frames.Length == 0)
                     return;
                 
-                var frame = _apngSource.Frames[_currentFrame];
-                if (_readyFrames.Count <= _currentFrame)
+                var frame = _apngSource.Frames[currentFrame];
+                if (readyFrames.Count <= currentFrame)
                 {
                     var xOffset = frame.FcTlChunk.XOffset;
                     var yOffset = frame.FcTlChunk.YOffset;
@@ -133,13 +123,13 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                     {
                         var frameBitmap = BitmapFactory.FromStream(frame.GetStream());
 
-                        var blendMode = _currentFrame == 0 || frame.FcTlChunk.BlendOp == BlendOps.ApngBlendOpSource
+                        var blendMode = currentFrame == 0 || frame.FcTlChunk.BlendOp == BlendOps.ApngBlendOpSource
                             ? WriteableBitmapExtensions.BlendMode.None
                             : WriteableBitmapExtensions.BlendMode.Alpha;
 
                         if (blendMode == WriteableBitmapExtensions.BlendMode.None
-                            && frameBitmap.Width == writeableBitmap.Width
-                            && frameBitmap.Height == writeableBitmap.Height)
+                            && Math.Abs(frameBitmap.Width - writeableBitmap.Width) < 0.01
+                            && Math.Abs(frameBitmap.Height - writeableBitmap.Height) < 0.01)
                         {
                             writeableBitmap = frameBitmap;
                         }
@@ -154,17 +144,17 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                                 blendMode);
                         }
                     }
-                    _readyFrames.Add(writeableBitmap.Clone());
-                    _readyFrames[_currentFrame].Freeze();
+                    readyFrames.Add(writeableBitmap.Clone());
+                    readyFrames[currentFrame].Freeze();
 
-                    if (_apngSource.Frames.Length == _currentFrame - 1)
+                    if (_apngSource.Frames.Length == currentFrame - 1)
                     {
                         writeableBitmap.Freeze();
                         writeableBitmap = null;
                     }
                 }
 
-                Image.Source = _readyFrames[_currentFrame];
+                Image.Source = readyFrames[currentFrame];
 
                 var den = frame.FcTlChunk.DelayDen == 0 ? 100 : frame.FcTlChunk.DelayDen;
                 var num = frame.FcTlChunk.DelayNum;
@@ -174,9 +164,6 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
             };
         }
 
-        private void StopPlaying()
-        {
-            _isPlaying = false;
-        }
+        private void StopPlaying() => _playingToken?.Cancel();
     }
 }

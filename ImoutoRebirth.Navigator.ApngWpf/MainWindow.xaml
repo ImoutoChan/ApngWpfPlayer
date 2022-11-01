@@ -6,7 +6,12 @@
         xmlns:apngPlayer="clr-namespace:ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer;assembly=ImoutoRebirth.Navigator.ApngWpfPlayer"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280">
-    <Grid>
-        <apngPlayer:ApngPlayer Source="69060e4e568c52eef85883be8e7050f7.png" />
-    </Grid>
+    <DockPanel>
+        <Button Click="ButtonBase_OnClick" DockPanel.Dock="Top" Width="100" Height="20" Content="Next" />
+        <Grid>
+            <apngPlayer:ApngPlayer 
+                x:Name="ApngPlayer"
+                Source="69060e4e568c52eef85883be8e7050f7.png" />
+        </Grid>
+    </DockPanel>
 </Window>
