@@ -2,7 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/ImoutoRebirth.ApngWpfPlayer.svg?style=flat-square)](https://www.nuget.org/packages/ImoutoRebirth.ApngWpfPlayer)
 
-WPF User Control that can show APNG/PNG animated files and play them
+WPF User Control that can show [APNG/PNG](https://wiki.mozilla.org/APNG_Specification) animated files and play them
 
 ## Usage
 
