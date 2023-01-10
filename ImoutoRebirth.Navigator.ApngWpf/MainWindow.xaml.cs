@@ -30,8 +30,7 @@ namespace ImoutoRebirth.Navigator.ApngWpf
             var sources = new[]
             {
                 @"69060e4e568c52eef85883be8e7050f7.png",
-                @"e310012a65b7327a2aae463b2e8b01bf.png",
-                @"211322559-738f60fe-0c1f-4b23-9fee-c43db5212316.png",
+                @"e310012a65b7327a2aae463b2e8b01bf.png"
             };
 
             this.ApngPlayer.Source = ApngPlayer.Source == sources[0] ? sources[1] : sources[0];
