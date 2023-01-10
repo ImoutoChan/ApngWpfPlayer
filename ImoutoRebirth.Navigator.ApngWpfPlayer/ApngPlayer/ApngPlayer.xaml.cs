@@ -119,7 +119,8 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                         (int) _apngSource.DefaultImage.FcTlChunk.Width,
                         (int) _apngSource.DefaultImage.FcTlChunk.Height);
 
-                    using(writeableBitmap.GetBitmapContext())
+                    var writeableBitmapForCurrentFrame = writeableBitmap.Clone();
+                    using(writeableBitmapForCurrentFrame.GetBitmapContext())
                     {
                         var frameBitmap = BitmapFactory.FromStream(frame.GetStream());
 
@@ -128,14 +129,14 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                             : WriteableBitmapExtensions.BlendMode.Alpha;
 
                         if (blendMode == WriteableBitmapExtensions.BlendMode.None
-                            && Math.Abs(frameBitmap.Width - writeableBitmap.Width) < 0.01
-                            && Math.Abs(frameBitmap.Height - writeableBitmap.Height) < 0.01)
+                            && Math.Abs(frameBitmap.Width - writeableBitmapForCurrentFrame.Width) < 0.01
+                            && Math.Abs(frameBitmap.Height - writeableBitmapForCurrentFrame.Height) < 0.01)
                         {
-                            writeableBitmap = frameBitmap;
+                            writeableBitmapForCurrentFrame = frameBitmap;
                         }
                         else
                         {
-                            writeableBitmap.Blend(
+                            writeableBitmapForCurrentFrame.Blend(
                                 new Point((int) (xOffset),
                                     (int) (yOffset)),
                                 frameBitmap,
@@ -144,9 +145,23 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                                 blendMode);
                         }
                     }
-                    readyFrames.Add(writeableBitmap.Clone());
+                    readyFrames.Add(writeableBitmapForCurrentFrame.Clone());
                     readyFrames[currentFrame].Freeze();
-
+    
+                    switch (frame.FcTlChunk.DisposeOp)
+                    {
+                        case DisposeOps.ApngDisposeOpNone:
+                            writeableBitmap = writeableBitmapForCurrentFrame;
+                            break;
+                        case DisposeOps.ApngDisposeOpPrevious:
+                            // ignore change in this frame    
+                            break;
+                        case DisposeOps.ApngDisposeOpBackground:
+                            // unsupported
+                            writeableBitmap = writeableBitmapForCurrentFrame;
+                            break;
+                    }
+                    
                     if (_apngSource.Frames.Length == currentFrame - 1)
                     {
                         writeableBitmap.Freeze();

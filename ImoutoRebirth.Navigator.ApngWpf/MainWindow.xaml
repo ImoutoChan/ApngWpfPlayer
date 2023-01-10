@@ -11,7 +11,7 @@
         <Grid>
             <apngPlayer:ApngPlayer 
                 x:Name="ApngPlayer"
-                Source="69060e4e568c52eef85883be8e7050f7.png" />
+                Source="211322559-738f60fe-0c1f-4b23-9fee-c43db5212316.png" />
         </Grid>
     </DockPanel>
 </Window>
