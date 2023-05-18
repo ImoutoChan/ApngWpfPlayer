@@ -64,13 +64,12 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                 _apngSource = new ApngImage(path);
                 if (_apngSource.IsSimplePng)
                 {
-                    Image.Source = new BitmapImage(new Uri(path));
-                    _apngSource = null;
+                    StartPlaying(true);
                 }
                 else
                 {
                     _playingToken = new CancellationTokenSource();
-                    StartPlaying(_playingToken.Token);
+                    StartPlaying(false, _playingToken.Token);
                 }
             }
             finally
@@ -85,7 +84,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
             _apngSource = null;
         }
 
-        private async void StartPlaying(CancellationToken ct)
+        private async void StartPlaying(bool simple = false, CancellationToken ct = default)
         {
             if (ct.IsCancellationRequested)
                 return;
@@ -93,6 +92,18 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
             if (_apngSource == null)
             {
                 throw new InvalidOperationException();
+            }
+
+            if (simple)
+            {
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = _apngSource.DefaultImage.GetStream();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+                Image.Source = bitmapImage;
+                return;
             }
             
             var currentFrame = -1;
@@ -154,7 +165,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                             writeableBitmap = writeableBitmapForCurrentFrame;
                             break;
                         case DisposeOps.ApngDisposeOpPrevious:
-                            // ignore change in this frame    
+                            // ignore change in this frame
                             break;
                         case DisposeOps.ApngDisposeOpBackground:
                             // unsupported
@@ -170,7 +181,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                 }
 
                 Image.Source = readyFrames[currentFrame];
-
+                
                 var den = frame.FcTlChunk.DelayDen == 0 ? 100 : frame.FcTlChunk.DelayDen;
                 var num = frame.FcTlChunk.DelayNum;
 
