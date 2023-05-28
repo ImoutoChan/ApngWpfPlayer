@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -96,13 +98,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
 
             if (simple)
             {
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = _apngSource.DefaultImage.GetStream();
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
-                Image.Source = bitmapImage;
+                Image.Source = GetBitmapImage(_apngSource);
                 return;
             }
             
@@ -187,6 +183,45 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
 
                 var delay = (int) (num * (1000.0 / den));
                 await Task.Delay(delay);
+            };
+        }
+
+        private static BitmapImage GetBitmapImage(ApngImage apngSource)
+        {
+            try
+            {
+                var bi = new BitmapImage();
+                bi.BeginInit();
+                bi.CacheOption = BitmapCacheOption.OnLoad;
+                bi.StreamSource = apngSource.DefaultImage.GetStream();
+                bi.EndInit();
+                bi.Freeze();
+
+                return bi;
+            }
+            catch
+            {
+                var bi = new BitmapImage();
+                bi.BeginInit();
+                bi.CacheOption = BitmapCacheOption.OnLoad;
+                bi.UriSource = GetUri(apngSource.SourcePath);
+                bi.EndInit();
+                bi.Freeze();
+
+                return bi;
+            }
+        }
+
+        private static Uri GetUri(string source)
+        {
+            try
+            {
+                return new Uri(source);
+            }
+            catch
+            {
+                var appDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                return new Uri(Path.Combine(appDirectory!, source));
             };
         }
 

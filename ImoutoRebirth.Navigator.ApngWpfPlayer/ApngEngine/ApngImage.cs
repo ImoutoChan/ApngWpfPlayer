@@ -12,6 +12,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngEngine
         public ApngImage(string fileName)
             : this(File.ReadAllBytes(fileName))
         {
+            SourcePath = fileName;
         }
 
         private ApngImage(byte[] fileBytes)
@@ -134,6 +135,8 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngEngine
             _frames.ForEach(f => otherChunks.ForEach(f.AddOtherChunk));
         }
 
+        public string SourcePath { get; set; }
+        
         /// <summary>
         ///     Indicate whether the file is a simple PNG.
         /// </summary>
