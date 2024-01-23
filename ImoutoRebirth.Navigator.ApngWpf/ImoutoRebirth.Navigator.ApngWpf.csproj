@@ -21,6 +21,9 @@
     <None Update="59876e976c155e692a06584d9a7a61d5.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="blend sample with dispose op background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

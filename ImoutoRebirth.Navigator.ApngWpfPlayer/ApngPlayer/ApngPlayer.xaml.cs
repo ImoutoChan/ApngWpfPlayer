@@ -129,7 +129,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                     var writeableBitmapForCurrentFrame = writeableBitmap.Clone();
                     using(writeableBitmapForCurrentFrame.GetBitmapContext())
                     {
-                        var frameBitmap = BitmapFactory.FromStream(frame.GetStream());
+                        var frameBitmap = FromStream(frame.GetStream());
 
                         var blendMode = currentFrame == 0 || frame.FcTlChunk.BlendOp == BlendOps.ApngBlendOpSource
                             ? WriteableBitmapExtensions.BlendMode.None
@@ -144,8 +144,7 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                         else
                         {
                             writeableBitmapForCurrentFrame.Blend(
-                                new Point((int) (xOffset),
-                                    (int) (yOffset)),
+                                new Point((int) xOffset, (int) yOffset),
                                 frameBitmap,
                                 new Rect(0, 0, frame.FcTlChunk.Width, frame.FcTlChunk.Height),
                                 Colors.White,
@@ -165,7 +164,9 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                             break;
                         case DisposeOps.ApngDisposeOpBackground:
                             // unsupported
-                            writeableBitmap = writeableBitmapForCurrentFrame;
+                            writeableBitmap = BitmapFactory.New(
+                                (int) _apngSource.DefaultImage.FcTlChunk.Width,
+                                (int) _apngSource.DefaultImage.FcTlChunk.Height);
                             break;
                     }
                     
@@ -226,5 +227,17 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
         }
 
         private void StopPlaying() => _playingToken?.Cancel();
+        
+        public static WriteableBitmap FromStream(Stream stream)
+        {
+            var source = new BitmapImage();
+            source.BeginInit();
+            source.CreateOptions = BitmapCreateOptions.None;
+            source.StreamSource = stream;
+            source.EndInit();
+            var writeableBitmap = new WriteableBitmap(BitmapFactory.ConvertToPbgra32Format(source));
+            source.UriSource = null;
+            return writeableBitmap;
+        }
     }
 }

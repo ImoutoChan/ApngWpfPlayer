@@ -11,7 +11,7 @@
         <Grid>
             <apngPlayer:ApngPlayer 
                 x:Name="ApngPlayer"
-                Source="e310012a65b7327a2aae463b2e8b01bf.png" />
+                Source="blend sample with dispose op background.png" />
         </Grid>
     </DockPanel>
 </Window>
