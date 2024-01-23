@@ -5,16 +5,23 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.4.1</Version>
     <Authors>ImoutoChan</Authors>
     <Company>ImoutoRebirth</Company>
     <Product>ApngWpfPlayer</Product>
-    <Description>Wpf user control that can show apng/png animated files and play them</Description>
-    <Copyright>ImoutoChan</Copyright>
-    <Version>1.4.0</Version>
+    <Description>Wpf user control that can show apng/png animated files and play them.</Description>
+    <Copyright>(c) ImoutoChan</Copyright>
     <PackageId>ImoutoRebirth.ApngWpfPlayer</PackageId>
     <PackageProjectUrl>https://github.com/ImoutoChan/ApngWpfPlayer</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ImoutoChan/ApngWpfPlayer</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageTags>wpf user-control apng png animation animated image image-format player viewer usercontrol</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +39,11 @@
 
   <ItemGroup>
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
