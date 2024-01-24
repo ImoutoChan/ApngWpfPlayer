@@ -163,7 +163,6 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                             // ignore change in this frame
                             break;
                         case DisposeOps.ApngDisposeOpBackground:
-                            // unsupported
                             writeableBitmap = BitmapFactory.New(
                                 (int) _apngSource.DefaultImage.FcTlChunk.Width,
                                 (int) _apngSource.DefaultImage.FcTlChunk.Height);
