@@ -21,5 +21,5 @@ Install-Package ImoutoRebirth.ApngWpfPlayer
 ```
 or 
 ```xml
-<PackageReference Include="ImoutoRebirth.ApngWpfPlayer" Version="1.1.1" />
+<PackageReference Include="ImoutoRebirth.ApngWpfPlayer" Version="1.4.1" />
 ```
