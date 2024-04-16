@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:apngPlayer="clr-namespace:ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer;assembly=ImoutoRebirth.Navigator.ApngWpfPlayer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280">
+        Title="MainWindow" Height="720" Width="1280"
+        Background="Aquamarine">
     <DockPanel>
         <Button Click="ButtonBase_OnClick" DockPanel.Dock="Top" Width="100" Height="20" Content="Next" />
         <Grid>
             <apngPlayer:ApngPlayer 
                 x:Name="ApngPlayer"
-                Source="blend sample with dispose op background.png" />
+                Source="issue6.png" />
         </Grid>
     </DockPanel>
 </Window>

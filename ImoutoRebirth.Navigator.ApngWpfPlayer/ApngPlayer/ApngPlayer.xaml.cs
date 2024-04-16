@@ -105,32 +105,40 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
             var currentFrame = -1;
             List<WriteableBitmap> readyFrames = new();
             WriteableBitmap? writeableBitmap = null;
+            var numPlays = 0;
 
             while (!ct.IsCancellationRequested)
             {
                 currentFrame++;
 
                 if (currentFrame >= _apngSource.Frames.Length)
+                {
+                    numPlays++;
+                    if (numPlays == _apngSource.AcTlChunk.NumPlays)
+                        break;
+
                     currentFrame = 0;
+                }
 
                 if (_apngSource.Frames.Length == 0)
                     return;
                 
                 var frame = _apngSource.Frames[currentFrame];
+
                 if (readyFrames.Count <= currentFrame)
                 {
                     var xOffset = frame.FcTlChunk.XOffset;
                     var yOffset = frame.FcTlChunk.YOffset;
                     
                     writeableBitmap ??= BitmapFactory.New(
-                        (int) _apngSource.DefaultImage.FcTlChunk.Width,
-                        (int) _apngSource.DefaultImage.FcTlChunk.Height);
+                        _apngSource.IhdrChunk.Width,
+                        _apngSource.IhdrChunk.Height);
 
                     var writeableBitmapForCurrentFrame = writeableBitmap.Clone();
-                    using(writeableBitmapForCurrentFrame.GetBitmapContext())
+                    using (writeableBitmapForCurrentFrame.GetBitmapContext())
                     {
                         var frameBitmap = FromStream(frame.GetStream());
-
+                        
                         var blendMode = currentFrame == 0 || frame.FcTlChunk.BlendOp == BlendOps.ApngBlendOpSource
                             ? WriteableBitmapExtensions.BlendMode.None
                             : WriteableBitmapExtensions.BlendMode.Alpha;
@@ -144,16 +152,17 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                         else
                         {
                             writeableBitmapForCurrentFrame.Blend(
-                                new Point((int) xOffset, (int) yOffset),
+                                new Point((int)xOffset, (int)yOffset),
                                 frameBitmap,
                                 new Rect(0, 0, frame.FcTlChunk.Width, frame.FcTlChunk.Height),
                                 Colors.White,
                                 blendMode);
                         }
                     }
+
                     readyFrames.Add(writeableBitmapForCurrentFrame.Clone());
                     readyFrames[currentFrame].Freeze();
-    
+
                     switch (frame.FcTlChunk.DisposeOp)
                     {
                         case DisposeOps.ApngDisposeOpNone:
@@ -163,12 +172,16 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                             // ignore change in this frame
                             break;
                         case DisposeOps.ApngDisposeOpBackground:
-                            writeableBitmap = BitmapFactory.New(
-                                (int) _apngSource.DefaultImage.FcTlChunk.Width,
-                                (int) _apngSource.DefaultImage.FcTlChunk.Height);
+                            writeableBitmapForCurrentFrame.Blend(
+                                new Point((int)xOffset, (int)yOffset),
+                                BitmapFactory.New((int)frame.FcTlChunk.Width, (int)frame.FcTlChunk.Height),
+                                new Rect(0, 0, frame.FcTlChunk.Width, frame.FcTlChunk.Height),
+                                Colors.White,
+                                WriteableBitmapExtensions.BlendMode.None);
+                            writeableBitmap = writeableBitmapForCurrentFrame;
                             break;
                     }
-                    
+
                     if (_apngSource.Frames.Length == currentFrame - 1)
                     {
                         writeableBitmap.Freeze();

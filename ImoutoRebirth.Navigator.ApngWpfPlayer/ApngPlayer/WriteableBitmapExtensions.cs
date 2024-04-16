@@ -170,7 +170,54 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                                 if (blendMode == BlendMode.Alpha)
                                 {
                                     if (sourcePixel != 0)
-                                        destPixels[idx] = sourcePixel;
+                                    {
+                                        var destPixel = destPixels[idx];
+
+                                        if (destPixel == 0)
+                                        {
+                                            // no need to blend
+                                            destPixels[idx] = sourcePixel;
+                                        }
+                                        else
+                                        {
+                                            var da = (destPixel >> 24) & 0xff;
+                                            var dr = (destPixel >> 16) & 0xff;
+                                            var dg = (destPixel >> 8) & 0xff;
+                                            var db = destPixel & 0xff;
+                                        
+                                            var sa = (sourcePixel >> 24) & 0xff;
+                                            var sr = (sourcePixel >> 16) & 0xff;
+                                            var sg = (sourcePixel >> 8) & 0xff;
+                                            var sb = sourcePixel & 0xff;
+                                        
+                                            // normalizing to present color values in [0, 1]
+                                            var nda = da / 255.0;
+                                            var ndr = dr / 255.0;
+                                            var ndg = dg / 255.0;
+                                            var ndb = db / 255.0;
+                                            
+                                            var nsa = sa / 255.0;
+                                            var nsr = sr / 255.0;
+                                            var nsg = sg / 255.0;
+                                            var nsb = sb / 255.0;
+                                            
+                                            // alpha composition
+                                            // https://en.wikipedia.org/wiki/Alpha_compositing
+                                            // source = a, dest = b, operation = a over b
+                                            var resultAn = nsa + nda * (1 - nsa);
+                                            var resultRn = (nsr * nsa + ndr * nda * (1 - nsa)) / resultAn;
+                                            var resultGn = (nsg * nsa + ndg * nda * (1 - nsa)) / resultAn;
+                                            var resultBn = (nsb * nsa + ndb * nda * (1 - nsa)) / resultAn;
+
+                                            var resultA = (int) (resultAn * 255);
+                                            var resultR = (int) (resultRn * 255);
+                                            var resultG = (int) (resultGn * 255);
+                                            var resultB = (int) (resultBn * 255);
+                                            
+                                            var toWrite = (Math.Min(resultA, 255) << 24) | (resultR << 16) | (resultG << 8) | resultB;
+                                            destPixels[idx] = toWrite;
+                                        }
+                                    }
                                 }
                             }
 
