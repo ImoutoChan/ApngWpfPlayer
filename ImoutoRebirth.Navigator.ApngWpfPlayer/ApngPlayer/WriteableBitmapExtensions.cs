@@ -165,9 +165,8 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                                 if (blendMode == BlendMode.None)
                                 {
                                     destPixels[idx] = sourcePixel;
-                                }
-
-                                if (blendMode == BlendMode.Alpha)
+                                } 
+                                else if (blendMode == BlendMode.Alpha)
                                 {
                                     if (sourcePixel != 0)
                                     {
@@ -180,42 +179,23 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
                                         }
                                         else
                                         {
-                                            var da = (destPixel >> 24) & 0xff;
-                                            var dr = (destPixel >> 16) & 0xff;
-                                            var dg = (destPixel >> 8) & 0xff;
-                                            var db = destPixel & 0xff;
-                                        
-                                            var sa = (sourcePixel >> 24) & 0xff;
-                                            var sr = (sourcePixel >> 16) & 0xff;
-                                            var sg = (sourcePixel >> 8) & 0xff;
-                                            var sb = sourcePixel & 0xff;
-                                        
-                                            // normalizing to present color values in [0, 1]
-                                            var nda = da / 255.0;
-                                            var ndr = dr / 255.0;
-                                            var ndg = dg / 255.0;
-                                            var ndb = db / 255.0;
-                                            
-                                            var nsa = sa / 255.0;
-                                            var nsr = sr / 255.0;
-                                            var nsg = sg / 255.0;
-                                            var nsb = sb / 255.0;
+                                            var (destA, destR, destG, destB) = destPixel.NormalizeColorComponents();
+                                            var (sourceA, sourceR, sourceG, sourceB) = sourcePixel.NormalizeColorComponents();
                                             
                                             // alpha composition
                                             // https://en.wikipedia.org/wiki/Alpha_compositing
                                             // source = a, dest = b, operation = a over b
-                                            var resultAn = nsa + nda * (1 - nsa);
-                                            var resultRn = (nsr * nsa + ndr * nda * (1 - nsa)) / resultAn;
-                                            var resultGn = (nsg * nsa + ndg * nda * (1 - nsa)) / resultAn;
-                                            var resultBn = (nsb * nsa + ndb * nda * (1 - nsa)) / resultAn;
+                                            var resultAn = sourceA + destA * (1 - sourceA);
+                                            var resultRn = (sourceR * sourceA + destR * destA * (1 - sourceA)) / resultAn;
+                                            var resultGn = (sourceG * sourceA + destG * destA * (1 - sourceA)) / resultAn;
+                                            var resultBn = (sourceB * sourceA + destB * destA * (1 - sourceA)) / resultAn;
 
                                             var resultA = (int) (resultAn * 255);
                                             var resultR = (int) (resultRn * 255);
                                             var resultG = (int) (resultGn * 255);
                                             var resultB = (int) (resultBn * 255);
                                             
-                                            var toWrite = (Math.Min(resultA, 255) << 24) | (resultR << 16) | (resultG << 8) | resultB;
-                                            destPixels[idx] = toWrite;
+                                            destPixels[idx] = (resultA << 24) | (resultR << 16) | (resultG << 8) | resultB;
                                         }
                                     }
                                 }
@@ -239,13 +219,25 @@ namespace ImoutoRebirth.Navigator.ApngWpfPlayer.ApngPlayer
             if (sourcePixels.Format.BitsPerPixel != 8) 
                 return sourcePixels.Pixels[index];
 
-
             var pixels = (byte*) sourcePixels.WriteableBitmap.BackBuffer;
             var trueColor = sourcePixels.WriteableBitmap.Palette.Colors[pixels[index]];
 
             var intColor = BitConverter.ToInt32(new[] {trueColor.B, trueColor.G, trueColor.R, trueColor.A}, 0);
-                
+
             return intColor;
         }
+    }
+}
+
+public static class ColorExtensions
+{
+    public static (double A, double R, double G, double B) NormalizeColorComponents(this int pixel)
+    {
+        var a = (pixel >> 24) & 0xff;
+        var r = (pixel >> 16) & 0xff;
+        var g = (pixel >> 8) & 0xff;
+        var b = pixel & 0xff;
+
+        return (a / 255.0, r / 255.0, g / 255.0, b / 255.0);
     }
 }
